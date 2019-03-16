@@ -1,0 +1,36 @@
+<div class="example-container">
+  <mat-dialog-content>
+    <mat-form-field>
+      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter Users">
+    </mat-form-field>
+    <mat-table #table [dataSource]="dataSource">
+
+      <ng-container matColumnDef="User_Id">
+        <mat-header-cell *matHeaderCellDef> User_Id </mat-header-cell>
+        <mat-cell *matCellDef="let User"> {{User.User_Id}} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="FirstName">
+        <mat-header-cell *matHeaderCellDef> FirstName </mat-header-cell>
+        <mat-cell *matCellDef="let User"> {{User.FirstName}} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="LastName">
+        <mat-header-cell *matHeaderCellDef> LastName </mat-header-cell>
+        <mat-cell *matCellDef="let User"> {{User.LastName}} </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="Action">
+        <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+        <mat-cell *matCellDef="let User">
+          <div>
+            <button mat-button mat-raised-button class="mr-2" value="User.User_Id" [mat-dialog-close]="User" color="primary">
+              Select</button>
+          </div>
+        </mat-cell>
+      </ng-container>
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+    <mat-paginator [pageSizeOptions]="[5]" showFirstLastButtons></mat-paginator>
+  </mat-dialog-content>
+</div>

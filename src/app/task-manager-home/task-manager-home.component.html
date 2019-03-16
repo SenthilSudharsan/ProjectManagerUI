@@ -1,0 +1,158 @@
+<ng-template #content>
+  <button type="submit" mat-button mat-raised-button class="mr-2" value="createTask.TaskId" color="primary">
+    <mat-icon>{{'add'}}</mat-icon>Add Task</button>
+  <button type="button" mat-button mat-raised-button value="createTask.TaskId" (click)="Reset();CreateTask.resetForm()" color="accent">
+    <mat-icon>{{'clear'}}</mat-icon>Reset</button>
+</ng-template>
+<ng-template #other_content>
+  <button type="submit" mat-button mat-raised-button class="mr-2" value="createTask.TaskId" color="primary">
+    <mat-icon>{{'add'}}</mat-icon>Update Task</button>
+  <button type="button" mat-button mat-raised-button value="createTask.TaskId" (click)="Reset();CreateTask.resetForm()" color="warn">
+    <mat-icon>{{'cancel'}}</mat-icon>Cancel</button>
+</ng-template>
+<div class="example-container">
+  <mat-tab-group class="" [(selectedIndex)]="selectedTab" (selectedTabChange)="onTabClick($event)">
+    <mat-tab label="Add Project">
+      <app-project-manager></app-project-manager>
+    </mat-tab>
+
+    <mat-tab label="Add Task">
+      <div class="col-md-4 offset-md-4 mt-4">
+        <form #CreateTask="ngForm" (ngSubmit)="onSubmit(CreateTask)">
+          <mat-form-field class="example-full-width col-md-9 pl-0">
+            <input required matInput #ProjectName="ngModel" placeholder="Project" [disabled]="true" name="ProjectName" [(ngModel)]="createTask.ProjectName"
+              value="{{SelectedProjectName}}" />
+            <input type="hidden" [(ngModel)]="createTask.Project_Id" name="Project_Id" />
+            <div class="customMatError" *ngIf="isProjectEmpty">
+              Project is
+              <strong>required</strong>
+            </div>
+          </mat-form-field>
+          <button [disabled]="!createTask.IsCreate" type="button" mat-button mat-raised-button (click)="openProjectDialog()" class="mr-2" value="createTask.Project_Id"
+            color="primary">
+            <mat-icon>{{'search'}}</mat-icon>
+          </button>
+          <mat-form-field class="example-full-width">
+            <input required matInput #Task="ngModel" placeholder="Task Name" name="Task" [(ngModel)]="createTask.Task">
+            <input type="hidden" [(ngModel)]="createTask.TaskId" name="TaskId">
+            <mat-error>
+              Task Name is
+              <strong>required</strong>
+            </mat-error>
+          </mat-form-field>
+          <div class="example-full-width">
+            <mat-checkbox [disabled]="!(createTask.IsCreate)" (change)="onSetParentChange($event)" [(ngModel)]="createTask.IsParentTask" name="IsParentTask">Parent Task</mat-checkbox>
+          </div>
+          <div>
+            <label style="color:rgba(0, 0, 0, 0.53);">Priority</label>
+            <mat-slider [disabled]="createTask.IsParentTask" placeholder="Priority" style="width:90%;" [max]="30" [min]="0" [step]="1"
+              [thumbLabel]="true" [tickInterval]="1" [vertical]="false" [(ngModel)]="createTask.Priority" name="Priority">
+            </mat-slider>
+            <span class="text-small">30</span>
+          </div>
+          <mat-form-field class="example-full-width col-md-9 pl-0">
+            <input matInput placeholder="Parent Task" [disabled]="true" name="ParentTaskName" [(ngModel)]="createTask.ParentTaskName"
+              value="{{SelectedParentName}}" />
+            <input type="hidden" [(ngModel)]="createTask.Parent_Id" name="Parent_Id" />
+          </mat-form-field>
+          <button [disabled]="createTask.IsParentTask" type="button" mat-button mat-raised-button (click)="openParentDialog()" class="mr-2"
+            value="createTask.Parent_Id" color="primary">
+            <mat-icon>{{'search'}}</mat-icon>
+          </button>
+          <div>
+            <mat-form-field class="example-full-width col-md-6 pl-0">
+              <input (dateChange)="CompareDate()" [disabled]="createTask.IsParentTask" matInput [matDatepicker]="picker2" name="StartDate"
+                placeholder="Start Date" [(ngModel)]="createTask.StartDate" />
+              <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+              <mat-datepicker #picker2></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field class="example-full-width col-md-6">
+              <input (dateChange)="CompareDate()" [disabled]="createTask.IsParentTask" matInput [matDatepicker]="picker3" name="EndDate"
+                placeholder="End Date" [(ngModel)]="createTask.EndDate" />
+              <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+              <mat-datepicker #picker3></mat-datepicker>
+              <div class="customMatError mat-form-field-subscript-wrapper" *ngIf="isEndDateLess">
+                End Date is lesser than start date
+              </div>
+            </mat-form-field>
+          </div>
+          <mat-form-field class="example-full-width col-md-9 pl-0">
+            <input matInput placeholder="User" [disabled]="true" name="TaskUserName" [(ngModel)]="createTask.TaskUserName"
+              value="{{SelectedUserName}}" />
+            <input type="hidden" [(ngModel)]="createTask.UserId" name="UserId" />
+          </mat-form-field>
+          <button [disabled]="createTask.IsParentTask || !(createTask.IsCreate)" type="button" mat-button mat-raised-button (click)="openUserDialog()" class="mr-2"
+            value="createTask.UserId" color="primary">
+            <mat-icon>{{'search'}}</mat-icon>
+          </button>
+          <div *ngIf="createTask.IsCreate;then content else other_content" color="primary">
+          </div>
+        </form>
+      </div>
+    </mat-tab>
+    <mat-tab label="View Task">
+
+      <div class="col mt-3">
+        <mat-form-field class="example-full-width col-md-4 pl-0">
+          <input matInput placeholder="Project" [disabled]="true" name="CustomSearch" [(ngModel)]="CustomSearch" value="{{SelectedProjectName}}"
+          />
+        </mat-form-field>
+        <button type="button" mat-button mat-raised-button (click)="openProjectDialog()" class="mr-2" color="primary">
+          <mat-icon>{{'search'}}</mat-icon>
+        </button>
+        <label>Sort By</label>
+        <button type="button" mat-button mat-raised-button class="mr-2 ml-2" value="" (click)="sort('StartDate')" color="primary">
+          Start Date</button>
+        <button type="button" mat-button mat-raised-button class="mr-2" value="" (click)="sort('EndDate')" color="primary">
+          End Date</button>
+        <button type="button" mat-button mat-raised-button class="mr-2" value="" (click)="sort('Priority')" color="primary">
+          Priority</button>
+        <button type="button" mat-button mat-raised-button class="mr-2" value="" (click)="sort('Completed')" color="primary">
+          Completed</button>
+      </div>
+
+      <div class="col-md-12 mt-4">
+        <ul class="list-group list-group-flush">
+          <li *ngFor="let taskitem of TaskListSource | FilterPipe: CustomSearch; let i=index" class="list-group-item">
+            <div class="row">
+              <div class="row col-md-10">
+               <div class="col-md-2">
+                  <strong> Task</strong>
+                  <br/> {{ taskitem.Task }} </div>
+                <div class="col-md-2">
+                  <strong> Parent</strong>
+                  <br/> {{ taskitem.ParentDTOName }}</div>
+                <div class="col-md-2">
+                  <strong> Priority</strong>
+                  <br/> {{ taskitem.Priority }}</div>
+                <div class="col-md-3">
+                  <strong> Start</strong>
+                  <br/> {{ taskitem.StartDate| date: 'dd/MM/yyyy' }}</div>
+                <div class="col-md-3">
+                  <strong> End</strong>
+                  <br/> {{ taskitem.EndDate| date: 'dd/MM/yyyy' }}</div>
+              </div>
+              <div class="col col-md-2">
+                <div class="row" *ngIf="!taskitem.IsTaskEnded">
+                  <button mat-raised-button color="primary" class="col-md-4" (click)="editTask(taskitem,taskitem.ParentTask,taskitem.Project,taskitem.Users)">
+                    <mat-icon>edit</mat-icon> Edit</button>
+                  <button mat-raised-button color="warn" class="col-md-6 ml-1" (click)="endTask(taskitem.TaskId)">
+                    <mat-icon item-width="20px">cancel</mat-icon> End Task</button>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <li *ngIf="(TaskListSource | FilterPipe:CustomSearch).length==0" class="list-group-item">
+            <div class="alert alert-info">
+              There are no items to display.
+            </div>
+          </li>
+        </ul>
+      </div>
+    </mat-tab>
+    <mat-tab label="Add User">
+      <app-user-manager></app-user-manager>
+    </mat-tab>
+  </mat-tab-group>
+</div>

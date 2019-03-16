@@ -1,0 +1,90 @@
+<ng-template #contentCreateUser>
+  <button type="submit" mat-button mat-raised-button class="mr-2" value="createUserForm.User_Id" color="primary">
+    <mat-icon>{{'add'}}</mat-icon>Add User</button>
+  <button type="button" mat-button mat-raised-button value="createUserForm.User_Id" (click)="cancelUpdateUser();CreatingUserForm.resetForm()" color="accent">
+    <mat-icon>{{'clear'}}</mat-icon>Reset</button>
+</ng-template>
+<ng-template #contentUpdateUser>
+  <button type="submit" mat-button mat-raised-button class="mr-2" value="createUserForm.User_Id" color="primary">
+    <mat-icon>{{'add'}}</mat-icon>Update User</button>
+  <button type="button" mat-button mat-raised-button value="createUserForm.User_Id" (click)="cancelUpdateUser();CreatingUserForm.resetForm()" color="warn">
+    <mat-icon>{{'cancel'}}</mat-icon>Cancel</button>
+</ng-template>
+<div class="example-container col-md-4 offset-md-4 mt-4">
+  <form #CreatingUserForm="ngForm" (ngSubmit)="OnUserFormSubmit(CreatingUserForm)">
+    <mat-form-field class="example-full-width">
+      <input matInput placeholder="First Name" required name="FirstName" [(ngModel)]="createUserForm.FirstName" #FirstName="ngModel"
+      />
+      <input type="hidden" [(ngModel)]="createUserForm.User_Id" name="User_Id">
+      <mat-error>
+        First Name is
+        <strong>required</strong>
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field class="example-full-width">
+      <input matInput required placeholder="Last Name" name="LastName" [(ngModel)]="createUserForm.LastName" #LastName="ngModel"
+      />
+      <mat-error>
+        Last Name is
+        <strong>required</strong>
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field class="example-full-width">
+      <input matInput type="number" required placeholder="Employee Id" name="Employee_Id" [(ngModel)]="createUserForm.Employee_Id" #Employee_Id="ngModel"
+      />
+      <mat-error>
+        Employee Id is
+        <strong>required</strong>
+      </mat-error>
+    </mat-form-field>
+    <div *ngIf="createUserForm.IsCreate;then contentCreateUser else contentUpdateUser" color="primary">
+    </div>
+  </form>
+</div>
+<hr/>
+<div class="col-md-8 offset-md-2 mt-4">
+  <mat-form-field class="col-md-3">
+    <input matInput placeholder="Search" name="SearchValue" [(ngModel)]="SearchValue">
+  </mat-form-field>
+  <label>Sort By</label>
+  <button type="button" mat-button mat-raised-button class="mr-2 ml-2" value="" (click)="sort('FirstName')" color="primary">
+    FirstName</button>
+  <button type="button" mat-button mat-raised-button class="mr-2" value="" (click)="sort('LastName')" color="primary">
+    LastName</button>
+  <button type="button" mat-button mat-raised-button class="mr-2" value="" (click)="sort('EmpId')" color="primary">
+    EmployeeId</button>
+</div>
+<div class="col-md-8 offset-md-2 mt-4">
+  <ul class="list-group list-group-flush">
+    <li *ngFor="let useritem of userDataSource | FilterPipe: SearchValue; let i=index" class="list-group-item">
+      <div class="row">
+        <div class="col col-md-10">
+          <p>
+            <strong> FirstName:</strong> {{ useritem.FirstName }} </p>
+          <p>
+            <strong>LastName:</strong> {{ useritem.LastName }}</p>
+          <p>
+            <strong>Employee_Id:</strong> {{ useritem.Employee_Id }}</p>
+        </div>
+        <div class="col col-md-2">
+          <div class="row">
+            <div class="col col-12">
+              <button mat-raised-button color="primary" (click)="editUser(useritem)">
+                <mat-icon>create</mat-icon> Edit</button>
+              <br>
+              <br>
+              <button mat-raised-button color="warn" (click)="deleteUser(useritem)">
+                <mat-icon item-width="20px">delete</mat-icon> Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+
+    <li *ngIf="(userDataSource| FilterPipe:SearchValue).length==0" class="list-group-item">
+      <div class="alert alert-info">
+        There are no items to display.
+      </div>
+    </li>
+  </ul>
+</div>

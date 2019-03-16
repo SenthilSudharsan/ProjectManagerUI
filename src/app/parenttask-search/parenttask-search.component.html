@@ -1,0 +1,31 @@
+<div class="example-container">
+    <mat-dialog-content>
+      <mat-form-field>
+        <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter ParentTask">
+      </mat-form-field>
+      <mat-table #table [dataSource]="dataSourceParent">
+  
+        <ng-container matColumnDef="Parent_Id">
+          <mat-header-cell *matHeaderCellDef> Parent_Id </mat-header-cell>
+          <mat-cell *matCellDef="let ParentTask"> {{ParentTask.Parent_Id}} </mat-cell>
+        </ng-container>
+  
+        <ng-container matColumnDef="Parent_Task">
+          <mat-header-cell *matHeaderCellDef> Parent_Task </mat-header-cell>
+          <mat-cell *matCellDef="let ParentTask"> {{ParentTask.Parent_Task}} </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="Action">
+          <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+          <mat-cell *matCellDef="let ParentTask">
+            <div>
+              <button mat-button mat-raised-button class="mr-2" value="ParentTask.Parent_Id" [mat-dialog-close]="ParentTask" color="primary">
+                Select</button>
+            </div>
+          </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+      </mat-table>
+      <mat-paginator [pageSizeOptions]="[5]" showFirstLastButtons></mat-paginator>
+    </mat-dialog-content>
+  </div>

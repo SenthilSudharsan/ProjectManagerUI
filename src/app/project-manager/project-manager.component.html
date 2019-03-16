@@ -1,0 +1,126 @@
+<ng-template #contentCreateProject>
+  <button type="submit" mat-button mat-raised-button class="mr-2" value="creatingProjectForm.Project_Id" color="primary">
+    <mat-icon>{{'add'}}</mat-icon>Add Project</button>
+  <button type="button" mat-button mat-raised-button value="creatingProjectForm.Project_Id" (click)="cancelUpdateProject();CreatingProjectForm.resetForm()"
+    color="accent">
+    <mat-icon>{{'clear'}}</mat-icon>Reset</button>
+</ng-template>
+<ng-template #contentUpdateProject>
+  <button type="submit" mat-button mat-raised-button class="mr-2" value="creatingProjectForm.Project_Id" color="primary">
+    <mat-icon>{{'add'}}</mat-icon>Update Project</button>
+  <button type="button" mat-button mat-raised-button value="creatingProjectForm.Project_Id" (click)="cancelUpdateProject();CreatingProjectForm.resetForm()"
+    color="warn">
+    <mat-icon>{{'cancel'}}</mat-icon>Cancel</button>
+</ng-template>
+
+<div class="example-container col-md-4 offset-md-4 mt-4">
+  <form #CreatingProjectForm="ngForm" (ngSubmit)="OnProjectFormSubmit(CreatingProjectForm)">
+    <mat-form-field class="example-full-width">
+      <input matInput placeholder="Project Name" required name="ProjectName" [(ngModel)]="creatingProjectForm.ProjectName" #ProjectName="ngModel"
+      />
+      <input type="hidden" [(ngModel)]="creatingProjectForm.Project_Id" name="Project_Id">
+      <mat-error>
+        Project Name is
+        <strong>required</strong>
+      </mat-error>
+    </mat-form-field>
+    <div class="example-full-width">
+      <mat-checkbox [(ngModel)]="disabled" (change)="onSetDateChange($event)" [ngModelOptions]="{standalone: true}">Set Start and End Date</mat-checkbox>
+    </div>
+    <mat-form-field class="example-full-width col-md-6">
+      <input (dateChange)="CompareDates()" [disabled]="!(disabled)"  matInput [matDatepicker]="picker1"
+        name="Start_Date" placeholder="Start Date" [(ngModel)]="creatingProjectForm.Start_Date">
+      <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+      <mat-datepicker #picker1></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field class="example-full-width col-md-6">
+      <input (dateChange)="CompareDates()" [disabled]="!(disabled)"  matInput [matDatepicker]="picker2"
+        name="End_Date" placeholder="End Date" [(ngModel)]="creatingProjectForm.End_Date">
+      <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+      <mat-datepicker #picker2></mat-datepicker>
+      <div class="customMatError mat-form-field-subscript-wrapper" *ngIf="isProjectEndDateLess">
+        End Date is lesser than start date
+      </div>
+    </mat-form-field>
+    <div>
+      <label style="color:rgba(0, 0, 0, 0.53);">Priority</label>
+      <mat-slider placeholder="Priority" style="width:90%;" [max]="30" [min]="0" [step]="1" [thumbLabel]="true" [tickInterval]="1"
+        [vertical]="false" [(ngModel)]="creatingProjectForm.Priority" name="Priority">
+      </mat-slider>
+      <span class="text-small">30</span>
+    </div>
+    <mat-form-field class="example-full-width col-md-9">
+      <input matInput placeholder="Manager" [disabled]="true" name="ManagerName" [(ngModel)]="creatingProjectForm.ManagerName"
+        value="{{SelectedManagerName}}" />
+      <input type="hidden" [(ngModel)]="creatingProjectForm.UserId" name="UserId"  />
+    </mat-form-field>
+    <button type="button" mat-button mat-raised-button (click)="openDialog()" class="mr-2" value="creatingProjectForm.Project_Id"
+      color="primary">
+      <mat-icon>{{'search'}}</mat-icon>
+    </button>
+
+    <div *ngIf="creatingProjectForm.IsCreate;then contentCreateProject else contentUpdateProject" color="primary">
+    </div>
+  </form>
+</div>
+<hr/>
+<div class="col-md-8 offset-md-2 mt-4">
+  <mat-form-field class="col-md-3">
+    <input matInput placeholder="Search" name="projectSearchValue" [(ngModel)]="projectSearchValue">
+  </mat-form-field>
+  <label>Sort By</label>
+  <button type="button" mat-button mat-raised-button class="mr-2 ml-2" value="" (click)="sort('StartDate')" color="primary">
+    StartDate</button>
+  <button type="button" mat-button mat-raised-button class="mr-2" value="" (click)="sort('EndDate')" color="primary">
+    EndDate</button>
+  <button type="button" mat-button mat-raised-button class="mr-2" value="" (click)="sort('Priority')" color="primary">
+    Priority</button>
+  <button type="button" mat-button mat-raised-button class="mr-2" value="" (click)="sort('Completed')" color="primary">
+    Completed</button>
+</div>
+<div class="col-md-8 offset-md-2 mt-4">
+  <ul class="list-group list-group-flush">
+    <li *ngFor="let projectitem of projectDataSource | FilterPipe: projectSearchValue; let i=index" class="list-group-item">
+      <div class="row">
+        <div class="col col-md-8">
+          <p><strong>Project: </strong> {{ projectitem.ProjectName }} </p>
+          <div class="row">
+            <div class="col col-md-6">
+              <p><strong>No of Tasks: </strong><span class="badge badge-info"> {{ projectitem.TotalTaskCount }}</span></p>
+              <p><strong>Start Date: </strong> {{ projectitem.Start_Date| date: 'dd/MM/yyyy' }}</p>
+            </div>
+            <div class="col col-md-6">
+              <p>
+                <strong>Completed: </strong>
+                <span class="badge badge-info">{{ projectitem.CompletedTaskCount }}</span>
+              </p>
+              <p> <strong>End Date: </strong> {{ projectitem.End_Date | date: 'dd/MM/yyyy'}}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col col-md-2">
+          <p> <strong>Priority: </strong>
+            <span class="badge badge-info">{{ projectitem.Priority }}</span></p>
+        </div>
+        <div class="col col-md-2">
+          <div class="row">
+            <div class="col col-12">
+              <button mat-raised-button color="primary" (click)="editProject(projectitem,projectitem.lstUsers[0])">
+                <mat-icon>create</mat-icon> Update</button>
+              <br/>
+              <br/>
+              <button mat-raised-button color="warn" (click)="deleteProject(projectitem)">
+                <mat-icon item-width="20px">delete</mat-icon> Suspend</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+
+    <li *ngIf="(projectDataSource| FilterPipe:projectSearchValue).length==0" class="list-group-item">
+      <div class="alert alert-info">
+        There are no items to display.
+      </div>
+    </li>
+  </ul>
+</div>

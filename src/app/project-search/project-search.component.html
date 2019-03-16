@@ -1,0 +1,31 @@
+<div class="example-container">
+  <mat-dialog-content>
+    <mat-form-field>
+      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter Projects">
+    </mat-form-field>
+    <mat-table #table [dataSource]="dataSource">
+
+      <ng-container matColumnDef="Project_Id">
+        <mat-header-cell *matHeaderCellDef> Project_Id </mat-header-cell>
+        <mat-cell *matCellDef="let Project"> {{Project.Project_Id}} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="ProjectName">
+        <mat-header-cell *matHeaderCellDef> ProjectName </mat-header-cell>
+        <mat-cell *matCellDef="let Project"> {{Project.ProjectName}} </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="Action">
+        <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+        <mat-cell *matCellDef="let Project">
+          <div>
+            <button mat-button mat-raised-button class="mr-2" value="Project.Project_Id" [mat-dialog-close]="Project" color="primary">
+              Select</button>
+          </div>
+        </mat-cell>
+      </ng-container>
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+    <mat-paginator [pageSizeOptions]="[5]" showFirstLastButtons></mat-paginator>
+  </mat-dialog-content>
+</div>
